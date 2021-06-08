@@ -124,6 +124,63 @@ func isIsomorphic(s string, t string) bool {
 	return true
 }
 
+func areSentencesSimilar(sentence1 []string, sentence2 []string, similarPairs [][]string) bool {
+	if len(sentence1) != len(sentence2) {
+		return false
+	}
+	hashmap := make(map[string]map[string]bool)
+	for _, arr := range similarPairs {
+		if _, ok := hashmap[arr[0]]; !ok {
+			hashmap[arr[0]] = make(map[string]bool)
+		}
+		hashmap[arr[0]][arr[1]] = true
+		if _, ok := hashmap[arr[1]]; !ok {
+			hashmap[arr[1]] = make(map[string]bool)
+		}
+		hashmap[arr[1]][arr[0]] = true
+	}
+	for idx, word := range sentence1 {
+		if word == sentence2[idx] {
+			continue
+		}
+		if _, ok := hashmap[word][sentence2[idx]]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func inorderTraversal(root *TreeNode) []int {
+	if root == nil {
+		return make([]int, 0)
+	}
+	collector := []int{}
+	dfs(root, &collector)
+	return collector
+}
+
+func dfs(root *TreeNode, collector *[]int) {
+	if root == nil {
+		return
+	}
+	dfs(root.Left, collector)
+	*collector = append(*collector, root.Val)
+	dfs(root.Right, collector)
+}
+
 func main() {
-	fmt.Println(isIsomorphic("foo", "bar"))
+	arr := []int{}
+	sliceTest(&arr)
+	fmt.Println(arr)
+}
+
+func sliceTest(arr *[]int) {
+	*arr = append(*arr, 10)
+	*arr = append(*arr, 123)
 }
