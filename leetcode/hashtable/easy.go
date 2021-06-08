@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -174,12 +175,67 @@ func dfs(root *TreeNode, collector *[]int) {
 	dfs(root.Right, collector)
 }
 
-func main() {
-	arr := []int{}
-	sliceTest(&arr)
-	fmt.Println(arr)
+type Pair struct {
+	first  int
+	second int
 }
 
+func firstUniqChar(s string) int {
+	hashmap := make(map[rune]Pair)
+	ans := math.MaxInt32
+	for idx, char := range s {
+		if _, ok := hashmap[char]; !ok {
+			hashmap[char] = Pair{idx, 1}
+		} else {
+			hashmap[char] = Pair{hashmap[char].first, hashmap[char].second + 1}
+		}
+	}
+	for _, value := range hashmap {
+		if value.second == 1 && value.first < ans {
+			ans = value.first
+		}
+	}
+	if ans == math.MaxInt32 {
+		return -1
+	} else {
+		return ans
+	}
+}
+
+func uncommonFromSentences(s1 string, s2 string) []string {
+	s1Split := strings.Split(s1, " ")
+	s2Split := strings.Split(s2, " ")
+	s1map := make(map[string]int)
+	s2map := make(map[string]int)
+
+	for _, val := range s1Split {
+		s1map[val]++
+	}
+	for _, val := range s2Split {
+		s2map[val]++
+	}
+
+	ans := make(map[string]bool)
+	for key, value := range s1map {
+		if _, ok := s2map[key]; !ok && value == 1 {
+			ans[key] = true
+		}
+	}
+	for key, value := range s2map {
+		if _, ok := s1map[key]; !ok && value == 1 {
+			ans[key] = true
+		}
+	}
+	ret := []string{}
+	for key, _ := range ans {
+		ret = append(ret, key)
+	}
+	return ret
+}
+
+func main() {
+	fmt.Println(uncommonFromSentences("apple apple", "banana"))
+}
 func sliceTest(arr *[]int) {
 	*arr = append(*arr, 10)
 	*arr = append(*arr, 123)
