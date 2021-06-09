@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"sort"
 	"strings"
 )
 
@@ -33,7 +34,7 @@ func isAlienSorted(words []string, order string) bool {
 		for idx, char := range first {
 			if idx < len(second) && rune(second[idx]) != char && hashmap[char] > hashmap[rune(second[idx])] {
 				return false
-			} else if idx < len(second) && char < rune(second[idx]) {
+			} else if idx < len(second) && hashmap[char] < hashmap[rune(second[idx])] {
 				break
 			}
 		}
@@ -233,10 +234,250 @@ func uncommonFromSentences(s1 string, s2 string) []string {
 	return ret
 }
 
-func main() {
-	fmt.Println(uncommonFromSentences("apple apple", "banana"))
-}
 func sliceTest(arr *[]int) {
 	*arr = append(*arr, 10)
 	*arr = append(*arr, 123)
+}
+
+type Logger struct {
+	hashmap map[string]int
+	time    int
+}
+
+/** Initialize your data structure here. */
+func Constructor() Logger {
+	return Logger{make(map[string]int), 0}
+}
+
+/** Returns true if the message should be printed in the given timestamp, otherwise returns false.
+  If this method returns false, the message will not be printed.
+  The timestamp is in seconds granularity. */
+func (this *Logger) ShouldPrintMessage(timestamp int, message string) bool {
+	if _, ok := this.hashmap[message]; !ok || timestamp >= this.hashmap[message] {
+		this.hashmap[message] = timestamp + 10
+		return true
+	} else if this.hashmap[message] < timestamp {
+		return false
+	}
+	return false
+}
+
+func isAnagram(s string, t string) bool {
+	hashmap := make(map[rune]int)
+	for _, char := range s {
+		hashmap[char]++
+	}
+
+	for _, char := range t {
+		if _, ok := hashmap[char]; !ok {
+			return false
+		} else {
+			hashmap[char]--
+			if hashmap[char] <= 0 {
+				delete(hashmap, char)
+			}
+		}
+	}
+	return len(hashmap) == 0
+}
+
+func containsNearbyDuplicate(nums []int, k int) bool {
+	hashmap := make(map[int]int)
+	for idx, val := range nums {
+		if previdx, ok := hashmap[val]; ok && idx-previdx <= k {
+			return true
+		}
+		hashmap[val] = idx
+	}
+	return false
+}
+
+func arraysIntersection(arr1 []int, arr2 []int, arr3 []int) []int {
+
+	map1 := make(map[int]bool)
+	map2 := make(map[int]bool)
+
+	for _, val := range arr1 {
+		map1[val] = true
+	}
+	for _, val := range arr2 {
+		map2[val] = true
+	}
+	ansmap := make(map[int]bool)
+	for _, val := range arr3 {
+		_, ok1 := map1[val]
+		_, ok2 := map2[val]
+		if ok1 && ok2 {
+			ansmap[val] = true
+		}
+	}
+	ans := []int{}
+	for key, _ := range ansmap {
+		ans = append(ans, key)
+	}
+	sort.Ints(ans)
+	return ans
+
+}
+
+func singleNumber(nums []int) int {
+	val := nums[0]
+	for i := 1; i < len(nums); i++ {
+		val ^= nums[i]
+	}
+	return val
+}
+
+func sumOfUnique(nums []int) int {
+	freq := make(map[int]int)
+	for _, val := range nums {
+		freq[val]++
+	}
+	sum := 0
+	for key, value := range freq {
+		if value == 1 {
+			sum += key
+		}
+	}
+	return sum
+}
+
+func canPermutePalindrome(s string) bool {
+	freq := make(map[rune]int)
+	for _, char := range s {
+		freq[char]++
+	}
+	odd := 0
+	for _, value := range freq {
+		if value%2 != 0 {
+			odd++
+		}
+		if odd > 1 {
+			return false
+		}
+	}
+	return true
+}
+
+func findKthPositive(arr []int, k int) int {
+	set := make(map[int]bool)
+	for _, value := range arr {
+		set[value] = true
+	}
+	count := 0
+	for i := 1; ; i++ {
+		if _, ok := set[i]; !ok {
+			count++
+		}
+		if count == k {
+			return i
+		}
+	}
+}
+
+func intersection(nums1 []int, nums2 []int) []int {
+	set := make(map[int]bool)
+	for _, val := range nums1 {
+		set[val] = true
+	}
+	ansset := make(map[int]bool)
+	for _, val := range nums2 {
+		if set[val] {
+			ansset[val] = true
+		}
+	}
+	ans := []int{}
+	for key, _ := range ansset {
+		ans = append(ans, key)
+	}
+	return ans
+}
+
+func numJewelsInStones(jewels string, stones string) int {
+	set := make(map[rune]bool)
+
+	for _, char := range jewels {
+		set[char] = true
+	}
+	count := 0
+	for _, char := range stones {
+		if set[char] {
+			count++
+		}
+	}
+	return count
+}
+func intersect(nums1 []int, nums2 []int) []int {
+	freq1 := make(map[int]int)
+	freq2 := make(map[int]int)
+
+	for _, val := range nums1 {
+		freq1[val]++
+	}
+	for _, val := range nums2 {
+		freq2[val]++
+	}
+
+	ans := []int{}
+
+	for key, value := range freq2 {
+		if val, ok := freq1[key]; ok {
+			for i := 0; i < min(value, val); i++ {
+				ans = append(ans, key)
+			}
+		}
+	}
+
+	return ans
+}
+
+func min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func isStrobogrammatic(num string) bool {
+	stro := make(map[rune]rune)
+	stro['0'], stro['1'], stro['6'], stro['8'], stro['9'] = '0', '1', '9', '8', '6'
+
+	if len(num)%2 != 0 && !(num[len(num)/2] == '0' || num[len(num)/2] == '1' || num[len(num)/2] == '8') {
+		return false
+	}
+	for i := 0; i < len(num)/2; i++ {
+		curr := num[i]
+		if rune(num[len(num)-i-1]) != stro[rune(curr)] {
+			return false
+		}
+	}
+	return true
+}
+
+func islandPerimeter(grid [][]int) int {
+	count := 0
+	for row := 0; row < len(grid); row++ {
+		for col := 0; col < len(grid[row]); col++ {
+			if grid[row][col] != 1 {
+				continue
+			}
+			dirs := [][]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+			for _, dir := range dirs {
+				nextR := row + dir[0]
+				nextC := col + dir[1]
+				if !inside(nextR, nextC, grid) || grid[nextR][nextC] == 0 {
+					count++
+				}
+
+			}
+		}
+	}
+	return count
+}
+
+func inside(row int, col int, grid [][]int) bool {
+	return row >= 0 && col >= 0 && row < len(grid) && col < len(grid[row])
+}
+func main() {
+	fmt.Println(isStrobogrammatic("181"))
 }
